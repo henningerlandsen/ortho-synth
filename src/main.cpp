@@ -1,6 +1,8 @@
 #include <Audio.h>
 #include <Wire.h>
 
+#include "arp.h"
+
 // GUItool: begin automatically generated code
 AudioSynthNoiseWhite     noise1;         //xy=113,469
 AudioSynthWaveform       wave2;       //xy=114,419
@@ -43,6 +45,8 @@ struct OscData {
 };
 OscData osc[2];
 
+Arp arp;
+
 
 float getNoteFreq(int index) {
   if (index < 0) {
@@ -73,20 +77,21 @@ void onNoteOn(byte channel, byte note, byte velocity) {
   Serial.print("Note on: ");
   Serial.println(note);
 
-  current_note_index = note - 24;
+  arp.noteOn(note - 24);
 
-  updateOscFreq();
+  // updateOscFreq();
 
-  ampEnv.noteOn();
-  filterEnv.noteOn();
+  // ampEnv.noteOn();
+  // filterEnv.noteOn();
 }
 
 void onNoteOff(byte channel, byte note, byte velocity) {
   Serial.print("Note off: ");
   Serial.println(note);
-  ampEnv.noteOff();
-  filterEnv.noteOff();
+  // ampEnv.noteOff();
+  // filterEnv.noteOff();
 
+  arp.noteOff(note - 24);
 }
 
 void onControlChange(byte channel, byte control, byte midi_value) {
@@ -193,12 +198,16 @@ void setup() {
 void loop() { 
   usbMIDI.read();
 
-  if (++counter % 100000 == 0) {
-    int value = digitalRead(A0);
-    Serial.print("Analog read: ");
-    Serial.print(counter);
-    Serial.print(" - ");
-    Serial.println(value);
+  const Arp::State state = arp.getNextState();
+  if (state.note == -1) {
+    ampEnv.noteOff();
+    filterEnv.noteOff();
   }
-  
- }  
+  else if (state.cycle == Arp::State::Cycle::Trigger)
+  {
+    current_note_index = state.note;
+   updateOscFreq();
+   ampEnv.noteOn();
+   filterEnv.noteOn();   
+  }
+}  
