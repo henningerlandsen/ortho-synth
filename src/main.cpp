@@ -35,6 +35,7 @@ float notes[85] = {
 float channels[4] = {1.0, 1.0, 1.0, 1.0};
 float main_volume = 0.10;
 int current_note_index = 0;
+int counter = 0;
 
 struct OscData {
   float octave = 0;
@@ -163,7 +164,7 @@ void setup() {
   // Setup audio system
   AudioMemory(20);
   // Turn on the full voltage amplifier
-  // dac.analogReference(EXTERNAL);
+  //dac.analogReference(EXTERNAL);
   delay(50); // Give voltage time to stabilize
   
   // Turn on the amp
@@ -191,4 +192,13 @@ void setup() {
 
 void loop() { 
   usbMIDI.read();
+
+  if (++counter % 100000 == 0) {
+    int value = digitalRead(A0);
+    Serial.print("Analog read: ");
+    Serial.print(counter);
+    Serial.print(" - ");
+    Serial.println(value);
+  }
+  
  }  
