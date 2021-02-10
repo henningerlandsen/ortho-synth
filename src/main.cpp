@@ -33,7 +33,7 @@ float notes[85] = {
 };
 
 float channels[4] = {1.0, 1.0, 1.0, 1.0};
-float main_volume = 0.02;
+float main_volume = 0.10;
 int current_note_index = 0;
 
 struct OscData {
@@ -89,6 +89,10 @@ void onNoteOff(byte channel, byte note, byte velocity) {
 }
 
 void onControlChange(byte channel, byte control, byte midi_value) {
+  Serial.print("Midi CC: ");
+  Serial.print(control);
+  Serial.print(" Val: ");
+  Serial.println(midi_value);
   const float value = float(midi_value) / 127;
   switch (control) {
     case 95:
@@ -187,4 +191,4 @@ void setup() {
 
 void loop() { 
   usbMIDI.read();
- }
+ }  
