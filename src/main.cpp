@@ -35,7 +35,7 @@ float notes[85] = {
 };
 
 float channels[4] = {1.0, 1.0, 1.0, 1.0};
-float main_volume = 0.10;
+float main_volume = 0.02;
 int current_note_index = 0;
 int counter = 0;
 
@@ -156,6 +156,9 @@ void onControlChange(byte channel, byte control, byte midi_value) {
       break;
     case 112:
       filter1.resonance(5 * value);
+      break;
+    case 113:
+      arp.setTicksPerStep(50'000 * (1 + value));
       break;
   }
 }

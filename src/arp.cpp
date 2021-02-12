@@ -43,18 +43,20 @@ Arp::State Arp::getNextState()
         return state;
     }
 
-    ++ticks;
     if (ticks >= ticks_per_step) 
     {
-        current_step = (current_step + 1) % note_count;
         ticks = 0;
-
+    }
+    
+    if (ticks == 0) {
+        current_step = (current_step + 1) % note_count;
         state.cycle = State::Cycle::Trigger;
     }
     else
     {
         state.cycle = State::Cycle::Hold;
     }
+    ++ticks;
     state.note = note_buffer[current_step];
 
     return state;

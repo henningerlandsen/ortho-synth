@@ -25,7 +25,7 @@ private:
     static constexpr unsigned int MAX_NOTES = 6u;
     int note_buffer[MAX_NOTES] = { -1, -1, -1, -1, -1, -1 };
     unsigned int note_count = 0;
-    unsigned int ticks_per_step = 10000;
+    unsigned int ticks_per_step = 50'000;
     unsigned int current_step = 0;
     unsigned int ticks = 0;
 };
