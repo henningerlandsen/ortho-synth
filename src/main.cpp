@@ -34,14 +34,14 @@ float notes[85] = {
   4186.009
 };
 
-float channels[4] = {1.0, 1.0, 1.0, 1.0};
+float channels[4] = {1.0, 1.0, 0.0, 0.0};
 float main_volume = 0.02;
 int current_note_index = 0;
 int counter = 0;
 
 struct OscData {
-  float octave = 0;
-  float tune = 0;
+  int octave = 0;
+  int tune = 0;
 };
 OscData osc[2];
 
@@ -70,7 +70,7 @@ void updateOscFreq() {
   Serial.println(osc1_freq);
 
   wave1.frequency(osc1_freq);
-  wave2.frequency(getNoteFreq(current_note_index + osc[1].octave * 12) + osc[1].tune);  
+  wave2.frequency(getNoteFreq(current_note_index + (osc[1].octave * 12) + osc[1].tune));  
 }
 
 void onNoteOn(byte channel, byte note, byte velocity) {
@@ -114,7 +114,7 @@ void onControlChange(byte channel, byte control, byte midi_value) {
       updateOscFreq();
       break;
     case 98:
-      osc[1].tune = (value - 0.5) * 64;
+      osc[1].tune = midi_value - 64;
       updateOscFreq();
       break;
     case 99:
@@ -158,7 +158,7 @@ void onControlChange(byte channel, byte control, byte midi_value) {
       filter1.resonance(5 * value);
       break;
     case 113:
-      arp.setTicksPerStep(50'000 * (1 + value));
+      arp.setTicksPerStep(10'000 * (1 + value * 20));
       break;
   }
 }
@@ -181,11 +181,11 @@ void setup() {
   delay(10); // Allow time to wake
 
   // Setup audio sources
-  wave1.begin(WAVEFORM_SAWTOOTH);
+  wave1.begin(WAVEFORM_PULSE);
   wave1.amplitude(1.0);
   wave1.frequency(440);
 
-  wave2.begin(WAVEFORM_SQUARE);
+  wave2.begin(WAVEFORM_PULSE);
   wave2.amplitude(1.0);
   wave2.frequency(220);
 
