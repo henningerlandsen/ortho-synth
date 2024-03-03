@@ -2,6 +2,7 @@
 #include <Wire.h>
 
 #include "arp.h"
+#include "matrix.h"
 
 // GUItool: begin automatically generated code
 AudioSynthNoiseWhite noise1;      //xy=113,469
@@ -46,6 +47,7 @@ struct OscData
 OscData osc[2];
 
 Arp arp;
+Matrix matrix;
 
 float getNoteFreq(int index)
 {
@@ -189,9 +191,12 @@ void setup()
   delay(50); // Give voltage time to stabilize
 
   // Turn on the amp
-  pinMode(5, OUTPUT);
-  digitalWrite(5, HIGH);
+  pinMode(24, OUTPUT);
+  digitalWrite(24, HIGH);
   delay(10); // Allow time to wake
+
+  // Setup the keyboard matrix
+  matrix.configure({0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}, {25, 26, 27, 28});
 
   // Setup audio sources
   wave1.begin(WAVEFORM_PULSE);
@@ -214,6 +219,14 @@ void setup()
 void loop()
 {
   usbMIDI.read();
+
+  const Matrix::Event e = matrix.scan();
+  if (e.key != -1) {
+    Serial.print("Key: ");
+    Serial.print(e.key);
+    Serial.print(" pressed: ");
+    Serial.println(e.pressed);
+  }
 
   const Arp::State state = arp.getNextState();
   if (state.note == -1)
